@@ -99,3 +99,31 @@ public T peek()
 }
 ```
 ...where the user can change the top element with the memory location returned. I don't know if this is ought to happening.
+
+## Calculator utility
+Stack can be utilised as a calculator - not some real-time calculations, but more like entering a string of numbers and operators;
+stacks are good at this as calculating priorities vary among different operators, where a stack can handle them easily.
+
+An arithmetic expression can be either infix, prefix or postfix. We'll do the infix calculator first. 
+
+Ideas and concepts before code implementation:
+1. Use a cursor to traverse throughout the given expression to scan operands and operators
+	* The start of the expression must be a number
+	* If scanned a numeral, continue scanning until reached a space or operator; the next object scanned should be an operator
+	* Ignore ALL spaces
+
+2. After finishing scanning a numeral, convert to BigDecimal and push into numeral stack
+
+3. If scanned an operator:
+	* Make sure the next object is a numeral
+	* If the operator stack is empty, push
+	* If there is already operator(s) in the stack, then:
+		* If this operation is __prior__ to the existing (*/ to +-), push
+		* If not, compute the existing operation (prior) by popping first two numerals and one operator, push the resulting numeral into numeral stack, and at then end push this operator
+
+4. When finished scanning without issues, calculate numerals in stack from top to bottom, each time popping two numerals and an operator, and eventually push the resulting numeral back into numeral stack;</br>
+After all the calculations (operator stack empty), the numeral stack should only contain 1 numeral as the final answer. If this is not the case, report as an unexpected exception.
+* It's fine to put an equals sign at the end of expression; however it must be made sure that no more elements are following this space.
+
+It will be a huge effort to explain on the code implementation, while the source file of infix calculator is well commented, under directory `calculators`; have a check if you want to go deeper.
+Also some leetcode calculator problems are included under directory `leetcode`.

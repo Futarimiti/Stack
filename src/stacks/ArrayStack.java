@@ -1,3 +1,5 @@
+package stacks;
+
 import static java.lang.String.format;
 import static java.lang.String.join;
 
@@ -22,7 +24,13 @@ public class ArrayStack<T>
 	{
 		return top == -1;
 	}
+	
+	public int size()
+	{
+		return this.top + 1;
+	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	public boolean push(T elem)
 	{
 		if (this.isFull()) return false;
