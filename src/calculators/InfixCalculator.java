@@ -219,7 +219,7 @@ public class InfixCalculator
 						else if (priorityOf('*') > priorityOf(operatorStack.peek())) operatorStack.push('*');
 						else // finish all operations with higher priority
 						{
-							finishAllPriorOperations(numStack , operatorStack , ch);
+							finishAllPriorOperations(numStack , operatorStack , '*');
 						}
 						
 						nextIsNum = true; // we then expect a numeral as to evaluate the bracket content.
