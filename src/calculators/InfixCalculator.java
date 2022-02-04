@@ -243,7 +243,7 @@ public class InfixCalculator
 			numStack.push(calc(op1 , operator , op2));
 		}
 		
-		assert numStack.size() == 1 && operatorStack.isEmpty();
+		assert numStack.size() == 1 && operatorStack.isEmpty() : "Internal error";
 		return numStack.pop();
 	}
 	
