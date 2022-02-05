@@ -106,6 +106,7 @@ stacks are good at this as calculating priorities vary among different operators
 
 An arithmetic expression can be either infix, prefix or postfix. We'll do the infix calculator first. 
 
+### Infix calculator
 Ideas and concepts before code implementation:
 1. Use a cursor to traverse throughout the given expression to scan operands and operators
 	* The start of the expression must be a number

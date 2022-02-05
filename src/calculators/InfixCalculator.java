@@ -4,44 +4,80 @@ import static java.lang.Character.isDigit;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 import stacks.ArrayStack;
 
 public class InfixCalculator
 {
-	public static final Character[] operators = new Character[] {'+' , '-' , '*' , '/'};
-	public final int scale;
+	/**
+	 * a map of character of binary operator to corresponding binary BigDecimal function.
+	 * to be initialised in constructor.
+	 */
+	public final Map<Character, BinaryOperator<BigDecimal>> operations;
 	
+	/**
+	 * a set of recognised operators, basically `operations.keySet()`.
+	 * to be initialised in constructor as that's where $operations is initialised.
+	 */
+	public final Set<Character> operators;
+	
+	/**
+	 * the scale (i.e. number of d.p.) when representing a decimal numeral.
+	 * protected with setter to avoid being negative.
+	 * by default 4.
+	 */
+	private int scale = 4;
+	
+	/**
+	 * initialise an infix calculator with specified scale.
+	 *
+	 * @param scale scale for the new infix calculator.
+	 */
 	public InfixCalculator(int scale)
 	{
 		this.scale = scale;
+		operations = Map.of(
+				'+' , BigDecimal::add ,
+				'-' , BigDecimal::subtract ,
+				'*' , BigDecimal::multiply ,
+				'/' , (num1 , num2) -> num1.divide(num2 , this.scale , RoundingMode.HALF_UP)
+				// '^' , (num1 , num2) -> {
+				// 	if (!num2.toPlainString().matches("\\d+(\\.0*)?")) throw new IllegalArgumentException("For now, the exponent can only be a positive integer");
+				// 	return num1.pow(num2.intValue());
+				// }
+		);
+		operators = operations.keySet();
 	}
 	
+	/**
+	 * initialise infix calculator with scale 4.
+	 */
 	@SuppressWarnings("unused")
 	public InfixCalculator()
 	{
-		this.scale = 4;
-	}
-	
-	private static int priorityOf(char operator)
-	{
-		// maybe use properties file at some time?
-		return switch (operator)
-				{
-					case '+' , '-' -> 0;
-					case '*' , '/' -> 1;
-					default -> throw new IllegalArgumentException(
-							operator + " is not a recognised operator among " + Arrays.toString(operators));
-				};
+		operations = Map.of(
+				'+' , BigDecimal::add ,
+				'-' , BigDecimal::subtract ,
+				'*' , BigDecimal::multiply ,
+				'/' , (num1 , num2) -> num1.divide(num2 , this.scale , RoundingMode.HALF_UP)
+				// '^' , (num1 , num2) -> {
+				// 	if (!num2.toPlainString().matches("\\d+(\\.0*)?")) throw new IllegalArgumentException("For now, the exponent can only be a positive integer");
+				// 	return num1.pow(num2.intValue());
+				// }
+		);
+		operators = operations.keySet();
 	}
 	
 	/**
 	 * performs a primary syntax check around the expression
-	 * return nothing; throw exceptions for any abnormalities
+	 * returns nothing but throws exceptions for any abnormalities
 	 */
-	private static void primaryCheck(String expression)
+	private void primaryCheck(String expression)
 	{
 		if (expression == null) throw new NullPointerException();
 		
@@ -64,19 +100,56 @@ public class InfixCalculator
 	}
 	
 	/**
+	 * getter for $scale.
+	 */
+	public int scale()
+	{
+		return scale;
+	}
+	
+	/**
+	 * setter for $scale that prohibits negative input.
+	 */
+	public void setScale(int scale)
+	{
+		if (scale < 0) throw new IllegalArithmeticExpressionSyntaxException("Scale cannot be negative: " + scale);
+		this.scale = scale;
+	}
+	
+	/**
+	 * designed to be returning a **RELATIVE** priority comparing to the other operators.
+	 * should only be used to compare priorities of two operators, NOT an absolute priority rank.
+	 *
+	 * @param operator the operator to have relative priority checked
+	 * @return relative priority in int among other operators
+	 * TODO: use Comparator<Character>?
+	 */
+	private int priorityOf(char operator)
+	{
+		// maybe use properties file at some time?
+		// need to make sure all operators in this.operators are included
+		if (!this.operators.contains(operator))
+			throw new IllegalArgumentException(operator + " is not a recognised operator among " + this.operators);
+		
+		return switch (operator)
+				{
+					case '+' , '-' -> 0;
+					case '*' , '/' -> 1;
+					default -> throw new IllegalStateException(
+							"Internal error: priority of operator '" + operator + "' is not specified in method $priorityOf");
+				};
+	}
+	
+	/**
 	 * performs a calculation given two operands and an operator.
 	 */
 	private BigDecimal calc(BigDecimal num1 , char operator , BigDecimal num2)
 	{
-		return switch (operator)
-				{
-					case '+' -> num1.add(num2);
-					case '-' -> num1.subtract(num2);
-					case '*' -> num1.multiply(num2);
-					case '/' -> num1.divide(num2 , this.scale , RoundingMode.HALF_UP);
-					default -> throw new IllegalArgumentException(
-							operator + " is not a recognised operator among " + Arrays.toString(operators));
-				};
+		if (!operators.contains(operator))
+			throw new IllegalArgumentException(operator + " is not a recognised operator among " + this.operators);
+		
+		BiFunction<BigDecimal, BigDecimal, BigDecimal> operation = operations.get(operator);
+		return operation.apply(num1 , num2);
 	}
 	
 	/**
@@ -84,7 +157,7 @@ public class InfixCalculator
 	 */
 	private boolean isOperator(char c)
 	{
-		return List.of(operators).contains(c);
+		return operators.contains(c);
 	}
 	
 	/**
@@ -250,8 +323,9 @@ public class InfixCalculator
 	/**
 	 * finishes all operations in the stack that are prior to this operation.
 	 */
-	private void finishAllPriorOperations(ArrayStack<BigDecimal> numStack , ArrayStack<Character> operatorStack ,
-	                                      char ch)
+	private void finishAllPriorOperations(
+			ArrayStack<BigDecimal> numStack , ArrayStack<Character> operatorStack , char ch
+	)
 	{
 		while (operatorStack.size() > 0 && priorityOf(operatorStack.peek()) >= priorityOf(ch))
 		{

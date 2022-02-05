@@ -32,7 +32,8 @@ public class ConsoleCalculator
 				String trimmedReceive = receive.trim();
 				
 				// identify commands
-				if (trimmedReceive.matches(":scale\\s+[0-9]+"))
+				if (trimmedReceive.equals(":scale")) console.printf("%d\n\n" , c.scale());
+				else if (trimmedReceive.matches(":scale\\s+[0-9]+"))
 				{
 					StringBuilder numSb = new StringBuilder();
 					
@@ -42,10 +43,11 @@ public class ConsoleCalculator
 						if (Character.isDigit(ch)) numSb.append(ch);
 					}
 					
-					int newCapacity = Integer.parseInt(numSb.toString());
+					int newScale = Integer.parseInt(numSb.toString());
 					
-					c = new InfixCalculator(newCapacity);
-					console.printf("New calculator initialised with capacity %d\n\n" , newCapacity);
+					c.setScale(newScale);
+					// console.printf("New calculator initialised with capacity %d\n\n" , newScale);
+					console.printf("\n");
 				}
 				else if (trimmedReceive.equals(":q") || trimmedReceive.equals(":quit")) System.exit(0);
 				else if (trimmedReceive.startsWith(":"))
