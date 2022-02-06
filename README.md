@@ -128,3 +128,15 @@ After all the calculations (operator stack empty), the numeral stack should only
 
 It will be a huge effort to explain on the code implementation, while the source file of infix calculator is well commented, under directory `calculators`; have a check if you want to go deeper.
 Also some leetcode calculator problems are included under directory `leetcode`.
+
+### Postfix calculator
+Consider the case `2 3 4 * +`, or `2 + 3 × 4` in infix expression:
+
+Scan from left to right:
+* `2` - Add to numeral stack
+* `3` - Add to numeral stack
+* `4` - Add to numeral stack
+* `*` - pop last two numerals and push in their product `12`
+* `+` - pop last two numerals and push in their sum `14`
+
+A postfix does not contain brackets, so we do not need to take calculating priority into consideration; whenever we meet an operation, we perform it with two numerals in the stack.

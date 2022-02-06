@@ -7,12 +7,11 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 
 import stacks.ArrayStack;
 
-public class InfixCalculator
+public class InfixCalculator implements Calculator
 {
 	/**
 	 * a map of character of binary operator to corresponding binary BigDecimal function.
@@ -148,8 +147,7 @@ public class InfixCalculator
 		if (!operators.contains(operator))
 			throw new IllegalArgumentException(operator + " is not a recognised operator among " + this.operators);
 		
-		BiFunction<BigDecimal, BigDecimal, BigDecimal> operation = operations.get(operator);
-		return operation.apply(num1 , num2);
+		return operations.get(operator).apply(num1 , num2);
 	}
 	
 	/**
@@ -283,7 +281,7 @@ public class InfixCalculator
 							System.out.println(msg);
 							// originally thrown as an exception, now warning only
 						}
-						else equalsFlag = true;
+						equalsFlag = true;
 					}
 					case '(' -> {
 						// meeting it while expecting an operator means multiply the content within.
