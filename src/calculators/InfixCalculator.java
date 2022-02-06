@@ -231,7 +231,7 @@ public class InfixCalculator implements Calculator
 				// parse this numeral while moving $i to next appropriate position
 				do
 				{
-					if (ch == 'e') eFlag = true;
+					if (ch == 'e' || ch == 'E') eFlag = true;
 					numSb.append(ch); // go to next char
 					i++;
 					if (i < expression.length()) ch = expression.charAt(i);
@@ -249,7 +249,7 @@ public class InfixCalculator implements Calculator
 						}
 						eFlag = false;
 					}
-				} while (isDigit(ch) || ch == '.' || ch == 'e');
+				} while (isDigit(ch) || ch == '.' || ch == 'e' || ch == 'E');
 				// syntax problems such as multiple . or e in a numeral will be dealt by BigDecimal constructor
 				
 				BigDecimal thisNum = new BigDecimal(numSb.toString());
