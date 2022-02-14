@@ -14,18 +14,6 @@ import stacks.ArrayStack;
 public class InfixCalculator implements Calculator
 {
 	/**
-	 * a map of character of binary operator to corresponding binary BigDecimal function.
-	 * to be initialised in constructor.
-	 */
-	public final Map<Character, BinaryOperator<BigDecimal>> operations;
-	
-	/**
-	 * a set of recognised operators, basically `operations.keySet()`.
-	 * to be initialised in constructor as that's where $operations is initialised.
-	 */
-	public final Set<Character> operators;
-	
-	/**
 	 * the scale (i.e. number of d.p.) when representing a decimal numeral.
 	 * protected with setter to avoid being negative.
 	 * by default 4.
@@ -33,44 +21,41 @@ public class InfixCalculator implements Calculator
 	private int scale = 4;
 	
 	/**
+	 * an unmodifiable map of character of binary operator to corresponding binary BigDecimal function.
+	 */
+	public final Map<Character, BinaryOperator<BigDecimal>> operations = Map.of(
+			'+' , BigDecimal::add ,
+			'-' , BigDecimal::subtract ,
+			'*' , BigDecimal::multiply ,
+			'/' , (num1 , num2) -> num1.divide(num2 , this.scale , RoundingMode.HALF_UP)
+			// '^' , (num1 , num2) -> {
+			// 	if (!num2.toPlainString().matches("\\d+(\\.0*)?")) throw new IllegalArgumentException("For now, the exponent can only be a positive integer");
+			// 	return num1.pow(num2.intValue());
+			// }
+	);
+	
+	/**
+	 * a set of recognised operators, basically `operations.keySet()`.
+	 * to be initialised in constructor as that's where $operations is initialised.
+	 */
+	public final Set<Character> operators = operations.keySet();
+	
+	/**
 	 * initialise an infix calculator with specified scale.
 	 *
 	 * @param scale scale for the new infix calculator.
 	 */
+	@SuppressWarnings("unused")
 	public InfixCalculator(int scale)
 	{
 		this.scale = scale;
-		operations = Map.of(
-				'+' , BigDecimal::add ,
-				'-' , BigDecimal::subtract ,
-				'*' , BigDecimal::multiply ,
-				'/' , (num1 , num2) -> num1.divide(num2 , this.scale , RoundingMode.HALF_UP)
-				// '^' , (num1 , num2) -> {
-				// 	if (!num2.toPlainString().matches("\\d+(\\.0*)?")) throw new IllegalArgumentException("For now, the exponent can only be a positive integer");
-				// 	return num1.pow(num2.intValue());
-				// }
-		);
-		operators = operations.keySet();
 	}
 	
 	/**
 	 * initialise infix calculator with scale 4.
 	 */
 	@SuppressWarnings("unused")
-	public InfixCalculator()
-	{
-		operations = Map.of(
-				'+' , BigDecimal::add ,
-				'-' , BigDecimal::subtract ,
-				'*' , BigDecimal::multiply ,
-				'/' , (num1 , num2) -> num1.divide(num2 , this.scale , RoundingMode.HALF_UP)
-				// '^' , (num1 , num2) -> {
-				// 	if (!num2.toPlainString().matches("\\d+(\\.0*)?")) throw new IllegalArgumentException("For now, the exponent can only be a positive integer");
-				// 	return num1.pow(num2.intValue());
-				// }
-		);
-		operators = operations.keySet();
-	}
+	public InfixCalculator() {}
 	
 	/**
 	 * performs a primary syntax check around the expression
