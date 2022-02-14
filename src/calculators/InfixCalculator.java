@@ -14,6 +14,11 @@ import stacks.ArrayStack;
 public class InfixCalculator implements Calculator
 {
 	/**
+	 * rounding mode for division operation.
+	 */
+	public RoundingMode divisionRoundingMode = RoundingMode.HALF_UP;
+	
+	/**
 	 * the scale (i.e. number of d.p.) when representing a decimal numeral.
 	 * protected with setter to avoid being negative.
 	 * by default 4.
@@ -27,7 +32,7 @@ public class InfixCalculator implements Calculator
 			'+' , BigDecimal::add ,
 			'-' , BigDecimal::subtract ,
 			'*' , BigDecimal::multiply ,
-			'/' , (num1 , num2) -> num1.divide(num2 , this.scale , RoundingMode.HALF_UP)
+			'/' , (num1 , num2) -> num1.divide(num2 , this.scale , this.divisionRoundingMode)
 			// '^' , (num1 , num2) -> {
 			// 	if (!num2.toPlainString().matches("\\d+(\\.0*)?")) throw new IllegalArgumentException("For now, the exponent can only be a positive integer");
 			// 	return num1.pow(num2.intValue());
@@ -49,6 +54,19 @@ public class InfixCalculator implements Calculator
 	public InfixCalculator(int scale)
 	{
 		this.scale = scale;
+	}
+	
+	/**
+	 * initialise an infix calculator with specified scale and rounding mode.
+	 *
+	 * @param scale        scale for the new infix calculator.
+	 * @param roundingMode rounding mode for division operation.
+	 */
+	@SuppressWarnings("unused")
+	public InfixCalculator(int scale , RoundingMode roundingMode)
+	{
+		this.scale = scale;
+		this.divisionRoundingMode = roundingMode;
 	}
 	
 	/**
