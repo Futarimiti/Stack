@@ -140,3 +140,4 @@ Scan from left to right:
 * `+` - pop last two numerals and push in their sum `14`
 
 A postfix does not contain brackets, so we do not need to take calculating priority into consideration; whenever we meet an operation, we perform it with two numerals in the stack.
+
